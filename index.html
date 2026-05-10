@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stocura Help — Inventory management that thinks ahead</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Help and documentation for Stocura — how reorder calculations work, what every metric means, and how to get the most out of the platform.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231C1C3A'/%3E%3Ctext x='50' y='68' font-family='system-ui' font-size='60' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #FAF8F5;
+      --surface: #FFFFFF;
+      --ink: #0E1B2C;
+      --ink-soft: #475569;
+      --ink-faint: #94A3B8;
+      --rule: #E8EFF5;
+      --accent: #1C1C3A;
+      --accent-2: #1E4A6B;
+      --highlight: #FFF7ED;
+      --highlight-edge: #F6AD55;
+      --highlight-ink: #7c2d12;
+      --code-bg: #F3F4F6;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+
+    /* ── Header ─────────────────────────────────── */
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 18px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky; top: 0; z-index: 100;
+    }
+    header .wrap {
+      max-width: 1240px; margin: 0 auto;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .brand {
+      font-size: 18px; font-weight: 700; letter-spacing: 0.02em;
+      color: #fff; display: flex; align-items: center; gap: 10px;
+    }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: linear-gradient(135deg, #6366F1, #06B6D4);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: white;
+    }
+    .brand-suffix { color: rgba(255,255,255,0.55); font-weight: 400; }
+    .header-link {
+      color: rgba(255,255,255,0.8); font-size: 14px;
+      margin-left: auto;
+    }
+    .header-link:hover { color: #fff; }
+
+    /* ── Layout ─────────────────────────────────── */
+    .layout {
+      max-width: 1240px; margin: 0 auto;
+      display: grid; grid-template-columns: 240px 1fr;
+      gap: 48px; padding: 32px;
+    }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
+      .toc { position: static !important; max-height: none !important; }
+    }
+
+    /* ── TOC ────────────────────────────────────── */
+    .toc {
+      position: sticky; top: 84px;
+      align-self: start;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      font-size: 13px;
+      padding-right: 8px;
+    }
+    .toc h4 {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-faint); margin: 18px 0 6px; font-weight: 700;
+    }
+    .toc h4:first-child { margin-top: 0; }
+    .toc a {
+      display: block; padding: 4px 8px; border-radius: 4px;
+      color: var(--ink-soft); line-height: 1.4;
+    }
+    .toc a:hover { background: var(--surface); color: var(--ink); text-decoration: none; }
+
+    /* ── Main content ───────────────────────────── */
+    main { min-width: 0; }
+    main h1 {
+      font-size: 36px; font-weight: 700; letter-spacing: -0.02em;
+      margin: 0 0 8px; line-height: 1.2;
+    }
+    main .lede {
+      font-size: 18px; color: var(--ink-soft); margin: 0 0 36px; max-width: 680px;
+    }
+    main h2 {
+      font-size: 26px; font-weight: 700; letter-spacing: -0.01em;
+      margin: 56px 0 4px; padding-top: 12px;
+      border-top: 1px solid var(--rule);
+    }
+    main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 32px; }
+    main h2 .anchor-tag {
+      font-size: 12px; color: var(--ink-faint); font-weight: 400; margin-left: 8px;
+      text-transform: none; letter-spacing: 0;
+    }
+    main h3 {
+      font-size: 19px; font-weight: 700;
+      margin: 32px 0 8px; scroll-margin-top: 80px;
+    }
+    main h4 {
+      font-size: 15px; font-weight: 700;
+      margin: 20px 0 6px; color: var(--ink);
+    }
+    main p { margin: 0 0 14px; max-width: 720px; }
+    main ul, main ol { margin: 0 0 14px; padding-left: 24px; max-width: 720px; }
+    main li { margin: 4px 0; }
+    main hr { border: 0; border-top: 1px solid var(--rule); margin: 36px 0; }
+
+    .callout {
+      background: var(--highlight); border-left: 3px solid var(--highlight-edge);
+      padding: 14px 18px; border-radius: 6px;
+      margin: 16px 0; max-width: 720px;
+      color: var(--highlight-ink);
+      font-size: 14.5px;
+    }
+    .callout strong { color: var(--highlight-ink); }
+    .callout p:last-child { margin-bottom: 0; }
+
+    .formula {
+      background: #1C1C3A; color: #E2E8F0;
+      padding: 14px 18px; border-radius: 8px;
+      font: 13.5px/1.7 ui-monospace, "SF Mono", Menlo, monospace;
+      margin: 16px 0; max-width: 720px;
+      overflow-x: auto;
+    }
+    .formula em { color: #FED7AA; font-style: normal; }
+
+    .example {
+      background: var(--surface); border: 1px solid var(--rule);
+      padding: 16px 20px; border-radius: 8px;
+      margin: 16px 0; max-width: 720px;
+    }
+    .example h4 {
+      margin-top: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-faint); font-weight: 700;
+    }
+    .example p:last-child { margin-bottom: 0; }
+
+    table.ref {
+      border-collapse: collapse; width: 100%; max-width: 720px;
+      margin: 16px 0; font-size: 14px;
+    }
+    table.ref th, table.ref td {
+      padding: 8px 12px; text-align: left;
+      border-bottom: 1px solid var(--rule);
+    }
+    table.ref th {
+      background: var(--surface); font-weight: 700;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--ink-soft);
+    }
+
+    /* Sections need scroll-margin so anchor links don't get hidden under sticky header */
+    section, h2, h3 { scroll-margin-top: 84px; }
+    [id] { scroll-margin-top: 84px; }
+
+    /* ── Footer ─────────────────────────────────── */
+    footer {
+      max-width: 1240px; margin: 0 auto;
+      padding: 24px 32px 60px;
+      color: var(--ink-faint); font-size: 13px;
+      border-top: 1px solid var(--rule);
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="/" class="brand">
+      <span class="brand-mark">S</span>
+      Stocura<span class="brand-suffix"> · Help</span>
+    </a>
+    <a href="https://app.stocura.com" class="header-link">Open app &rarr;</a>
+  </div>
+</header>
+
+<div class="layout">
+
+<aside class="toc">
+  <h4>Start here</h4>
+  <a href="#welcome">Welcome</a>
+  <a href="#concepts">Core concepts</a>
+
+  <h4>Stock levels</h4>
+  <a href="#available">Available</a>
+  <a href="#on-hand">On Hand</a>
+  <a href="#on-order">On Order</a>
+  <a href="#avg-cost">Avg Cost</a>
+  <a href="#days-cover">Days Cover</a>
+  <a href="#stock-sync">Stock Sync</a>
+
+  <h4>Demand</h4>
+  <a href="#avg-daily-demand">Avg Daily Demand</a>
+  <a href="#typical-order-size">Typical Order Size</a>
+  <a href="#3-month-forecast">3-Month Forecast</a>
+
+  <h4>Reorder logic</h4>
+  <a href="#reorder-point-standard">Reorder Point (Standard)</a>
+  <a href="#reorder-point-seasonal">Reorder Point (Seasonal)</a>
+  <a href="#reorder-source">Reorder Source</a>
+  <a href="#manual-reorder-point">Manual Reorder Point</a>
+  <a href="#seasonal-reorder-adjustment">Seasonal Adjustment</a>
+  <a href="#seasonality-override">Seasonality Override</a>
+  <a href="#projected-order-date">Projected Order Date</a>
+
+  <h4>Demand boosts</h4>
+  <a href="#boost-multiplier">Multiplier</a>
+  <a href="#boost-window">Window</a>
+  <a href="#boost-reason">Reason</a>
+  <a href="#boost-set-actual">Set vs Actual</a>
+
+  <h4>Supplier &amp; ordering</h4>
+  <a href="#lead-time">Lead Time</a>
+  <a href="#lead-time-config">Lead Time (Config)</a>
+  <a href="#moq">MOQ</a>
+  <a href="#pack-size">Pack Size</a>
+  <a href="#buffer-stock">Buffer Stock</a>
+  <a href="#last-po-date">Last PO Date</a>
+  <a href="#last-po-qty">Last PO Qty</a>
+  <a href="#days-since-received">Days Since Received</a>
+
+  <h4>SKU lifecycle</h4>
+  <a href="#sku-status">Status</a>
+  <a href="#snooze">Snooze</a>
+  <a href="#first-seen">First Seen</a>
+
+  <h4>Notifications</h4>
+  <a href="#notifications">Email digests</a>
+
+  <h4>Help &amp; FAQ</h4>
+  <a href="#faq">Frequently asked</a>
+</aside>
+
+<main>
+
+<h1 id="welcome">Stocura Help</h1>
+<p class="lede">Everything that goes into a reorder decision, what each metric means, and how to make the system work for the way you run your business.</p>
+
+<p>This is the long-form companion to the in-app tooltips. If you clicked a "Learn more →" link, you've landed in roughly the right place. Each tooltip's anchor matches a section heading here, so you can also use the table of contents on the left.</p>
+
+<p>If something isn't covered or doesn't match what you're seeing, send a note via <strong>? &rarr; Get support</strong> in the app.</p>
+
+<h2 id="concepts">Core concepts <span class="anchor-tag">#concepts</span></h2>
+
+<p>Stocura sits between your inventory system and your team. It pulls live stock numbers, learns from your sales history, and tells you what to reorder and when. The promise is simple: never run out of stock you should have, and don't tie up cash on stock you shouldn't.</p>
+
+<p>To do that well, the system distinguishes a handful of concepts that look similar but matter differently.</p>
+
+<h3>SKUs, products, and parents</h3>
+<p>A <strong>SKU</strong> is a stock-keeping unit — the smallest thing your warehouse counts. Some SKUs are finished products you sell; others are raw materials or components that go into finished products. Stocura tracks any SKU your inventory system tracks.</p>
+
+<h3>Stock levels</h3>
+<p>Three numbers describe your stock at any moment. They look similar but answer different questions:</p>
+<ul>
+  <li><strong>Available</strong> &mdash; what you can sell right now.</li>
+  <li><strong>On Hand</strong> &mdash; what's physically in the warehouse.</li>
+  <li><strong>Allocated</strong> &mdash; what's been promised to existing orders but hasn't shipped yet.</li>
+</ul>
+<p>The relationship: <code>Available = On Hand − Allocated</code>. If you have 100 on hand and 30 are tied to open orders, only 70 are available to promise to the next customer.</p>
+
+<h3>Suppliers, lead time, MOQ</h3>
+<p>Each SKU is bought from a <strong>supplier</strong>. The supplier has a <strong>lead time</strong> (days from when you place the order to when stock arrives) and often a <strong>minimum order quantity</strong> (MOQ). Stocura uses lead time to work out when to reorder, and MOQ to round order quantities up to the smallest amount your supplier will accept.</p>
+
+<h3>The reorder point</h3>
+<p>The single most important number in Stocura. The <strong>reorder point</strong> is the stock level at which the system says "place a new order now." It's calculated to give you just enough buffer that the next batch lands before you run out — no more, no less.</p>
+
+<p>How it's calculated is the topic of the next section.</p>
+
+<h2 id="reorder-calculation">How the reorder calculation works</h2>
+
+<p>The reorder point answers a single question: <em>at what stock level should I place a new order so that my next stock arrives before I run out?</em></p>
+
+<p>The basic math:</p>
+<div class="formula">reorder_point = (<em>avg_daily_demand</em> × <em>lead_time_days</em>) × (1 + <em>safety_multiplier</em>)</div>
+
+<p>Three inputs, all derived from your data:</p>
+
+<ul>
+  <li><strong>Avg daily demand</strong> &mdash; how many units you sell per day, averaged over the trailing 12 months.</li>
+  <li><strong>Lead time</strong> &mdash; days from placing an order to stock arriving. Stocura uses your SKU-level setting first, falling back to the supplier-level default.</li>
+  <li><strong>Safety multiplier</strong> &mdash; a buffer that scales with how much data we have. More data = lower buffer, because the average is more reliable.</li>
+</ul>
+
+<table class="ref">
+  <tr><th>Months of data</th><th>Confidence</th><th>Safety multiplier</th></tr>
+  <tr><td>6+</td><td>High</td><td>1.0</td></tr>
+  <tr><td>3 to 5</td><td>Medium</td><td>1.5</td></tr>
+  <tr><td>Less than 3</td><td>Low</td><td>2.0</td></tr>
+</table>
+
+<div class="example">
+  <h4>Worked example</h4>
+  <p>You sell 0.6 units of SKU-X per day on average. Lead time is 7 days. You have 11 months of sales data, so confidence is high (multiplier 1.0).</p>
+  <p>Lead-time demand: <code>0.6 × 7 = 4.2</code> &mdash; you'll sell ~4 units while the next order is in transit.<br>
+  Safety stock: <code>4.2 × 1.0 = 4.2</code> &mdash; same again as a buffer.<br>
+  <strong>Reorder point: 4.2 + 4.2 = ~9 units.</strong></p>
+  <p>So when stock drops to 9, it's time to reorder.</p>
+</div>
+
+<p>That's the standard calculation. The system applies several adjustments on top:</p>
+<ul>
+  <li><strong>Seasonal lift</strong> &mdash; raises the reorder point ahead of detected high-demand windows (Christmas, Valentine's, Father's Day, etc.) so you start ordering early enough to land stock before the peak.</li>
+  <li><strong>Demand boosts</strong> &mdash; user-configured short-term multipliers for campaigns or other known demand events.</li>
+  <li><strong>Typical order size floor</strong> &mdash; ensures the reorder point never sits below the typical order size, so stock can't get "stuck" just below what customers want to buy.</li>
+  <li><strong>Manual override</strong> &mdash; lets you hard-set a reorder point when you know better than the data.</li>
+</ul>
+
+<p>Each of these is explained in detail in the sections below.</p>
+
+<hr>
+
+<h2>Stock levels reference</h2>
+
+<h3 id="available">Available</h3>
+<p>Stock you can sell right now &mdash; on hand minus what's already allocated to open orders. This is the number that matters for "can I take this customer's order?"</p>
+<p>If Available drops to or below your <a href="#buffer-stock">buffer stock</a> setting, the SKU is considered effectively out of stock.</p>
+
+<h3 id="on-hand">On Hand</h3>
+<p>Total units physically in the warehouse, including any tied to existing orders. This is what you'd count if you walked the shelves.</p>
+
+<h3 id="on-order">On Order</h3>
+<p>Units currently on a placed purchase order, due to arrive. The system uses this when computing <a href="#days-cover">days cover</a> and projected order dates so you don't double-order something that's already on its way.</p>
+
+<h3 id="avg-cost">Avg Cost (DEAR)</h3>
+<p>Average cost per unit pulled from your DEAR / Cin7 Core inventory system. Updates daily. Used for cost calculations across the app but not for any reorder logic.</p>
+
+<h3 id="days-cover">Days Cover</h3>
+<p>How many days of stock you have at the current sales rate, including units already on order. Calculated as:</p>
+<div class="formula">days_cover = (<em>available</em> + <em>on_order</em>) / <em>avg_daily_demand</em></div>
+<p>This is your runway. A SKU with 30 days cover doesn't need urgent attention; one with 3 days does.</p>
+
+<h3 id="stock-sync">Stock Synced</h3>
+<p>Last time we pulled live stock numbers from your inventory system. The hourly sync runs automatically &mdash; if this timestamp is more than a few hours old, something's wrong with the sync. Check the Admin page for sync status.</p>
+
+<hr>
+
+<h2>Demand reference</h2>
+
+<h3 id="avg-daily-demand">Avg Daily Demand</h3>
+<p>Average daily sales over the trailing 12 months. The basis for almost every reorder calculation. Updates as new sales data comes in.</p>
+<p>For SKUs with less than 12 months of data, we use whatever's available and apply a higher safety multiplier (see the <a href="#reorder-calculation">reorder calculation</a> section).</p>
+
+<h3 id="typical-order-size">Typical Order Size</h3>
+<p>Average units sold on days that had any movement, over the last 90 days. This is a different question from avg daily demand &mdash; it's not "how much do you sell per day on average," it's "when something <em>does</em> sell, how much typically goes out at once."</p>
+
+<p>Why this matters &mdash; the stuck-stock failure mode:</p>
+
+<div class="callout">
+  <p><strong>The problem.</strong> Imagine a SKU where customers typically order 10 at a time, but the calculated reorder point is 5. Once stock drops to 8, customers can't place 10-unit orders &mdash; e-commerce stores reject orders below available inventory. So no movement happens. Stock sits at 8 forever. Reorder never triggers. You silently lose sales.</p>
+</div>
+
+<p>To prevent this, Stocura uses Typical Order Size as a <strong>floor</strong> on the reorder point. If your calculated reorder point is below the typical order size, the system lifts the reorder point to the typical order size.</p>
+
+<p>Confidence rules: we need at least 5 days of movement in the last 90 to apply this as a floor. With fewer days, the average is too unstable to trust &mdash; we display the value but don't act on it.</p>
+
+<h3 id="3-month-forecast">3-Month Forecast</h3>
+<p>Expected total unit demand over the next 90 days, factoring in seasonality and trend. This is informational &mdash; the reorder calculation uses it for some decisions (peak-aware seasonal lift) but the headline forecast number you see is the sum across the next quarter.</p>
+
+<hr>
+
+<h2>Reorder logic reference</h2>
+
+<h3 id="reorder-point-standard">Reorder Point (Standard)</h3>
+<p>The basic reorder point: lead-time demand plus a confidence-weighted safety buffer. See <a href="#reorder-calculation">how the reorder calculation works</a> for the formula and a worked example.</p>
+
+<h3 id="reorder-point-seasonal">Reorder Point (Seasonal)</h3>
+<p>The standard reorder point adjusted for seasonal patterns in your sales data, then floored at <a href="#typical-order-size">typical order size</a>. The system uses whichever of the two reorder points is higher when triggering alerts.</p>
+
+<p>Seasonal lift kicks in three different ways:</p>
+
+<ul>
+  <li><strong>Standard</strong> &mdash; no seasonality detected, or a flat period. Reorder Point (Seasonal) equals Reorder Point (Standard).</li>
+  <li><strong>Shifted</strong> &mdash; stock you order now will arrive during a high-demand window. We use forecast demand for the arrival period, not trailing average, so you order enough to cover what's coming.</li>
+  <li><strong>Peak ahead</strong> &mdash; a high-demand window starts after stock would arrive. We use lookahead forecast to lift the reorder point now, so you start ordering early enough.</li>
+</ul>
+
+<p>The goal is the same in all three: by the time the new stock lands, you have enough to cover whatever's actually about to happen, not whatever happened last month.</p>
+
+<h3 id="reorder-source">Reorder Source</h3>
+<p>Controls which reorder point the system actually uses to trigger alerts. Three options:</p>
+
+<ul>
+  <li><strong>System</strong> &mdash; always use the calculated reorder point. Best for SKUs with 6+ months of clean sales data.</li>
+  <li><strong>Manual</strong> &mdash; always use the value you set in <a href="#manual-reorder-point">Manual Reorder Point</a>, ignoring whatever the calculation says. Best for SKUs where you know better than the data &mdash; one-off products, contractual minimums, etc.</li>
+  <li><strong>Blended</strong> (default) &mdash; use your manual value until 6 months of data accumulates, then auto-graduate to the calculated value. Best for new SKUs where the calculation isn't reliable yet but will be eventually.</li>
+</ul>
+
+<p>Blended is the default for all new SKUs because it gets you set up quickly without locking the SKU into permanent manual mode. When a Blended SKU graduates to System, the system stamps the date and emails you so you know it's happened.</p>
+
+<h3 id="manual-reorder-point">Manual Reorder Point</h3>
+<p>Your hard-set reorder threshold. Used when Reorder Source is Manual or Blended. The system shows the calculated value alongside it as a reference, so you can compare your guess to what the data suggests.</p>
+
+<p>For new SKUs (in <code>staging</code> status, with no movement history), this field is required &mdash; the SKU can't move to <code>active</code> until you've given it a reasonable starting reorder point.</p>
+
+<h3 id="seasonal-reorder-adjustment">Seasonal Reorder Adjustment</h3>
+<p>How aggressively the system applies seasonal lift on this SKU. Three options:</p>
+
+<ul>
+  <li><strong>Auto</strong> (default) &mdash; lift reorder points during detected peaks, fall back to standard otherwise.</li>
+  <li><strong>Always enabled</strong> &mdash; lift even when seasonality is mild. Useful for products with subtle but real seasonal variation that the auto-detector might miss.</li>
+  <li><strong>Disabled</strong> &mdash; never apply seasonal lift. Useful for one-off viral spikes you don't want repeated next year (the seasonality detector would otherwise treat the spike as a recurring pattern).</li>
+</ul>
+
+<h3 id="seasonality-override">Seasonality Override</h3>
+<p>Force a specific seasonality category instead of auto-detecting from sales data. The system supports categories like Christmas, Valentine's Day, Father's Day, Mother's Day, Easter, and several others.</p>
+
+<p>Useful when you know the product's seasonality but don't have enough sales history yet for the system to detect it &mdash; e.g. a Christmas-themed SKU launched in March will look flat until October at which point you'll be too late.</p>
+
+<h3 id="projected-order-date">Projected Order Date</h3>
+<p>Best estimate of when stock will hit the reorder threshold, based on current sales rate and any units on order. Calculated as:</p>
+<div class="formula">days_until_reorder = (<em>available</em> &minus; <em>seasonal_reorder_point</em>) / <em>avg_daily_demand</em></div>
+<p>Then projected to a date. Useful for cash-flow planning &mdash; lets you see at a glance which SKUs need ordering this week vs next month.</p>
+
+<hr>
+
+<h2>Demand boosts</h2>
+
+<p>A demand boost is a short-term multiplier you apply when you know demand is about to spike for reasons your historical data can't see &mdash; running a Meta campaign, doing a wholesale push, having a product featured in a publication. The boost lifts your reorder point for the duration of the boost so you don't run out mid-campaign.</p>
+
+<h3 id="boost-multiplier">Multiplier</h3>
+<p>How much more demand you expect during the boost. <code>2×</code> means twice the normal sales rate. The number is multiplied through into the reorder calculation, so a SKU with avg daily demand of 0.6 and a 3× boost is treated as if avg daily demand were 1.8 for the duration of the boost.</p>
+
+<p>Boost stacks with seasonal lift. If you boost a SKU during its Christmas peak, both the seasonal index and the boost multiplier apply &mdash; the math is correct, but be careful about double-counting.</p>
+
+<div class="callout">
+  <p><strong>Heads up on double-counting.</strong> If you run the same campaign every December and your sales data already reflects that, the seasonality detector has baked the campaign into the trailing average. Adding a boost on top of that double-counts. Consider a smaller multiplier (capturing only the year-on-year incremental lift) for repeat-pattern campaigns. Genuinely new campaigns deserve the full multiplier.</p>
+</div>
+
+<h3 id="boost-window">Window (Starts and Ends)</h3>
+<p>Boosts run from the start date at midnight to the end date at end-of-day, in your tenant's local timezone. So a boost ending "11 May" runs through all of 11 May Sydney time and stops at midnight Sydney on the 12th.</p>
+
+<p>You can't backdate a boost &mdash; if the end date is in the past, the boost would have no effect on future calculations.</p>
+
+<h3 id="boost-reason">Reason</h3>
+<p>Optional but recommended. A short note about why you're boosting &mdash; campaign name, channel, product feature. The reason shows up in the boost history table and in the boost-ended digest email so you have context when reviewing whether the boost worked.</p>
+
+<h3 id="boost-set-actual">Set vs Actual</h3>
+<p>After a boost ends, the system computes how much lift actually happened by comparing average daily outflow during the boost window to the 30 days before. The result becomes the <strong>Actual</strong> column in the boost history.</p>
+
+<p>This is the system holding a mirror up to your campaign forecasts. Over time, you build intuition for what multipliers your campaigns really drive.</p>
+
+<table class="ref">
+  <tr><th>Colour</th><th>Meaning</th></tr>
+  <tr><td style="color:#276749;font-weight:600">Green</td><td>Actual lift was at least 95% of what you set. Your reorder point was lifted enough &mdash; you didn't lose sales to stockouts.</td></tr>
+  <tr><td style="color:#A07040;font-weight:600">Amber</td><td>Actual lift was less than 75% of what you set. You may have over-estimated and tied up cash in stock that didn't move as fast as expected.</td></tr>
+  <tr><td>Neutral</td><td>Actual was within ±20% of set. Roughly accurate.</td></tr>
+</table>
+
+<p>"Low confidence" appears when the boost ran for fewer than 5 days or the SKU's baseline outflow was very low &mdash; both make the ratio noisy. Treat low-confidence numbers as directional only.</p>
+
+<hr>
+
+<h2>Supplier and ordering reference</h2>
+
+<h3 id="lead-time">Lead Time</h3>
+<h3 id="lead-time-config">Lead Time (Config)</h3>
+<p>Days from placing a purchase order to stock arriving. Used in every reorder calculation &mdash; lead time directly determines how much lead-time demand the reorder point needs to cover.</p>
+
+<p>You can set lead time at the SKU level (overriding the supplier default) for cases where one product takes longer than the supplier's typical timeline. If the SKU-level field is blank, the system falls back to the supplier-level setting.</p>
+
+<h3 id="moq">MOQ</h3>
+<p>Minimum Order Quantity. The smallest amount your supplier will accept on a purchase order. Order quantities are rounded up to the next multiple of MOQ.</p>
+
+<h3 id="pack-size">Pack Size</h3>
+<p>Units per pack. If your supplier sells in cartons of 12, pack size is 12, and orders are rounded up to whole cartons. Pack size is applied <em>after</em> MOQ, so the final quantity respects both.</p>
+
+<h3 id="buffer-stock">Buffer Stock</h3>
+<p>Optional safety floor. Stock at or below this level counts as effectively out of stock &mdash; useful when you always want to keep a minimum on hand for VIPs, sample fulfillment, or pre-orders.</p>
+
+<p>The setting can be configured globally (in Admin) and overridden per-SKU. Leaving the per-SKU field blank uses the global default.</p>
+
+<h3 id="last-po-date">Last PO Date</h3>
+<p>When the most recent purchase order for this SKU was created. Note: this is when the order was <em>placed</em>, not when it arrived. See <a href="#days-since-received">Days Since Received</a> for arrival.</p>
+
+<h3 id="last-po-qty">Last PO Qty</h3>
+<p>How many units were ordered on the most recent purchase order. Useful for sanity-checking the system's <a href="#typical-order-size">typical order size</a> floor &mdash; if every PO is for 1,000 units but customers only order 5 at a time, the floor probably doesn't need to be very high.</p>
+
+<h3 id="days-since-received">Days Since Received</h3>
+<p>How long since stock last arrived from a supplier. Goes amber after 6 months &mdash; possibly a stale supplier relationship worth reviewing, or a SKU you're winding down without realising.</p>
+
+<hr>
+
+<h2>SKU lifecycle</h2>
+
+<h3 id="sku-status">Status</h3>
+<p>Where a SKU is in its lifecycle. Four values:</p>
+<ul>
+  <li><strong>Staging</strong> &mdash; new SKU not yet ready for active reordering. Hidden from the Reorder Queue. Used to onboard products before sales data exists.</li>
+  <li><strong>Active</strong> &mdash; available for sale, fully tracked, included in reorder calculations.</li>
+  <li><strong>Discontinuing</strong> &mdash; phasing out. Still tracked but flagged so you don't accidentally reorder.</li>
+  <li><strong>Discontinued</strong> &mdash; retired from active inventory. Hidden from most views.</li>
+</ul>
+
+<p>Staging SKUs require a <a href="#manual-reorder-point">manual reorder point</a> before they can move to Active. The system also sends a daily digest listing newly-staged SKUs so the team knows what needs configuring.</p>
+
+<h3 id="snooze">Snooze</h3>
+<p>Hides a SKU from the Reorder Queue until a specified date. Useful when you have excess stock from a one-off bulk buy and don't want it nagging you, or when you've placed a manual order outside the system that the data hasn't caught up with yet.</p>
+
+<p>Snoozed SKUs still appear in Stock Overview and SKU Master &mdash; only the Reorder Queue suppresses them. The snooze expires automatically on the chosen date.</p>
+
+<h3 id="first-seen">First Seen</h3>
+<p>When this SKU first appeared in your inventory data. Mostly informational &mdash; useful for distinguishing newer SKUs (where less history is available) from established ones.</p>
+
+<hr>
+
+<h2 id="notifications">Notifications and email digests</h2>
+
+<p>Stocura sends a small number of email digests rather than a stream of individual alerts. All digests fire at your configured digest time in your local timezone &mdash; one email per day per category, even if multiple events occur.</p>
+
+<h3>Reorder alerts (digest)</h3>
+<p>Daily list of SKUs that crossed their reorder point since the last pass. Configure recipients and digest time on the Settings page.</p>
+
+<h3>Staging notifications</h3>
+<p>Daily list of newly-staged SKUs that need a manual reorder point set before they can become active. Helps prevent SKUs from sitting in staging indefinitely.</p>
+
+<h3>Reorder graduation</h3>
+<p>One-off email when a Blended SKU has accumulated 6 months of data and auto-graduates to System reorder source. Lets you know the system is now using the calculated value rather than your manual one.</p>
+
+<h3>Boost ended</h3>
+<p>Daily digest of demand boosts that ended (auto-expired or manually ended) since the last pass. Includes the actual lift comparison so you can refine your estimates next time.</p>
+
+<hr>
+
+<h2 id="faq">FAQ</h2>
+
+<h3>Why is my reorder point higher than I expected?</h3>
+<p>A few things can lift it above the basic calculation: an active <a href="#boost-multiplier">demand boost</a>, the <a href="#typical-order-size">typical order size floor</a>, seasonal lift, or a <a href="#manual-reorder-point">manual override</a>. The Reorder Point (Seasonal) sub-line on the SKU detail page tells you which one is in effect.</p>
+
+<h3>Why hasn't my SKU graduated yet?</h3>
+<p>Graduation runs once per day and only fires when a Blended SKU has 6+ months of accumulated data. If you set the SKU up 4 months ago, it has 2 more months to wait. You can switch the SKU to System manually if you want to use the calculated value sooner.</p>
+
+<h3>Why is the dashboard slow?</h3>
+<p>Reorder calculations run on every page load to ensure the numbers reflect the latest sync. For tenants with many SKUs (1,000+), this can take a few seconds. We're working on caching the engine output without sacrificing freshness.</p>
+
+<h3>What happens if I change a SKU's lead time?</h3>
+<p>The change is immediate &mdash; next reorder calculation uses the new value. Reorder points across the SKU detail page and the Reorder Queue update on the next page load. Nothing is "remembered" from the old lead time.</p>
+
+<h3>Can I bulk-edit SKUs?</h3>
+<p>Not yet through the UI. For now, individual edits via the SKU detail page or supplier-level settings (which cascade to all SKUs from that supplier) are the supported paths. Bulk import via CSV is on the roadmap.</p>
+
+<h3>Why did a SKU disappear from the Reorder Queue?</h3>
+<p>A few possibilities: stock recovered above the reorder point (good), a PO was placed and the on-order quantity now covers the threshold, or the SKU was snoozed. Check the SKU detail page &mdash; the dashboard hides SKUs whose <em>available + on order</em> exceeds the reorder threshold.</p>
+
+</main>
+
+</div>
+
+<footer>
+  <p>Stocura &middot; <a href="https://app.stocura.com">Open the app</a> &middot; <a href="https://stocura.com">Marketing site</a></p>
+</footer>
+
+</body>
+</html>
