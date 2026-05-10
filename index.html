@@ -245,6 +245,11 @@
   <a href="#reorder-queue-page">Reorder Queue</a>
   <a href="#stock-overview-page">Stock Overview</a>
   <a href="#sku-detail-page">SKU Detail page</a>
+  <a href="#dashboard-home-page">Dashboard home</a>
+  <a href="#slow-moving-page">Slow Moving items</a>
+  <a href="#suppliers-page">Suppliers</a>
+  <a href="#purchase-orders-page">Purchase Orders</a>
+  <a href="#wastage-page">Wastage / Adjustments</a>
 
   <h4>Stock levels</h4>
   <a href="#available">Available</a>
@@ -284,6 +289,19 @@
   <a href="#last-po-date">Last PO Date</a>
   <a href="#last-po-qty">Last PO Qty</a>
   <a href="#days-since-received">Days Since Received</a>
+  <a href="#lead-time-learning">Lead Time Learning</a>
+  <a href="#international-orders">International orders</a>
+
+  <h4>Slow-moving</h4>
+  <a href="#slow-moving-trigger">Trigger</a>
+  <a href="#slow-moving-decisions">Decision tags</a>
+
+  <h4>Purchase orders</h4>
+  <a href="#po-receipts">Receipts</a>
+  <a href="#po-changes">Recent changes</a>
+
+  <h4>Forecasting</h4>
+  <a href="#forecast-accuracy">Forecast accuracy</a>
 
   <h4>SKU lifecycle</h4>
   <a href="#sku-status">Status</a>
@@ -374,6 +392,47 @@
 </ul>
 
 <p>If you're new to a SKU, the order to read it is: stat cards (what's the situation?) → Product Info (any context I'm missing?) → charts (what's the pattern been?) → configuration (anything I should change?).</p>
+
+<h3 id="dashboard-home-page">Dashboard home</h3>
+<p>The first screen after sign-in. A high-level read on the whole operation: how many SKUs need ordering, how many are out of stock, how many active POs are in flight, total stock value, slow-moving count, and what's in staging. Each stat card is a link to the page that handles it.</p>
+
+<p>Below the cards, three at-a-glance panels:</p>
+<ul>
+  <li><strong>Stock Movement</strong> — daily units sold over the last 28 days. Spot quiet weeks, sudden spikes, or trend reversals.</li>
+  <li><strong>Top Movers / Top Wastage</strong> — what shifted most in the last 14 days, sales-side and loss-side. Useful for catching products that are unexpectedly hot, or unexpectedly leaking.</li>
+  <li><strong>Recent POs / Open Notes</strong> — last five POs with activity and the most recent unresolved SKU notes. A "where am I picking up from" reminder.</li>
+</ul>
+
+<p>Bottom of the page is the <a href="#forecast-accuracy">Forecast Accuracy</a> strip — a calibration check on how well the forecasting engine has been doing.</p>
+
+<h3 id="slow-moving-page">Slow Moving items</h3>
+<p>SKUs that aren't pulling their weight. Each one needs a decision: keep watching, discount, bundle into something else, liquidate, or mark for discontinuation. The page is structured to make those calls quickly.</p>
+
+<p>Two summary numbers at the top: total slow-moving SKUs, and how many of those still need a decision applied. The table is sorted with pending decisions on top, so each session you start at the work that needs you. See <a href="#slow-moving-trigger">how slow-moving is detected</a> and <a href="#slow-moving-decisions">decision tags</a> below for details.</p>
+
+<h3 id="suppliers-page">Suppliers</h3>
+<p>The home of supplier records and the launching pad for orders. Three views from this one page:</p>
+<ul>
+  <li><strong>List</strong> (/suppliers) — every supplier with active SKUs, plus their currency, country, lead time, and ordering method. Click any name to edit, or the <strong>Order</strong> button to start a PO.</li>
+  <li><strong>Detail / edit</strong> (/suppliers/:id) — basic info, contact details, ordering method, currency and tax, lifecycle status, <a href="#lead-time-learning">lead-time learning</a>, DEAR aliases, and quick stats. Use this to onboard a new supplier or correct details after a PO has gone through.</li>
+  <li><strong>Order</strong> (/suppliers/:id/order) — a build-the-PO grid showing every SKU sourced from this supplier with suggested order quantities pre-filled. Edit qtys, set the expected arrival date, click <strong>Review Order</strong> to see the summary, then confirm — the PO lands in DEAR as a Draft.</li>
+</ul>
+
+<p>Domestic suppliers and international suppliers use slightly different ordering UX — international (container) orders show months-of-cover and cover %; see <a href="#international-orders">international ordering</a>.</p>
+
+<h3 id="purchase-orders-page">Purchase Orders</h3>
+<p>Every PO that's been synced from DEAR, grouped by supplier. Two tabs:</p>
+<ul>
+  <li><strong>Open POs</strong> — placed but not yet fully received. Active inventory in the pipeline.</li>
+  <li><strong>All POs</strong> — full history including received and cancelled.</li>
+</ul>
+
+<p>Per-line columns show qty ordered, qty received, unit price, and the latest receipt date. The <strong>Lines with Recent Changes</strong> stat at the top tells you how many lines had a quantity, price, or status change since the last sync — see <a href="#po-changes">PO changes</a>. For partial-receipt mechanics see <a href="#po-receipts">PO receipts</a>. DEAR is the source of truth for prices and quantities; this page reflects DEAR's current state and surfaces the changes worth attention.</p>
+
+<h3 id="wastage-page">Wastage / Adjustments</h3>
+<p>All stock adjustments from DEAR — wastage, breakage, recounts, found stock, every signed correction to on-hand. Five summary numbers at the top: units lost, units gained, adjustment count, total line items, unique SKUs affected.</p>
+
+<p>Filter by date range (presets for 7d / 30d / 90d / 12mo / All time), by SKU, by supplier, by type (loss only / gain only). Group flat to see the full transaction line view, or by SKU for a per-product roll-up with a Net column. <strong>Include voided</strong> brings in DEAR adjustments that were created and then voided — usually data-entry corrections — useful for full-trail audits but excluded by default. Download CSV from the toolbar.</p>
 
 <h2 id="reorder-calculation">How the reorder calculation works</h2>
 
@@ -590,6 +649,28 @@
 <h3 id="days-since-received">Days Since Received</h3>
 <p>How long since stock last arrived from a supplier. Goes amber after 6 months &mdash; possibly a stale supplier relationship worth reviewing, or a SKU you're winding down without realising.</p>
 
+<h3 id="lead-time-learning">Lead Time Learning</h3>
+<p>Compares actual lead times (order placed → stock arrived) against the supplier-stated lead time. Once a few completed POs are recorded, you'll see <strong>Avg Actual</strong>, <strong>Avg Variance</strong> (how much late or early), and the min/max range on the supplier detail page.</p>
+
+<p>What to do with it:</p>
+<ul>
+  <li><strong>Variance close to zero</strong> &mdash; supplier is reliable. Stated lead time is fine.</li>
+  <li><strong>Positive variance (chronically late)</strong> &mdash; bump the supplier's stated lead time up so reorder points fire earlier. Don't just absorb the late delivery as wastage of cover.</li>
+  <li><strong>Wide range</strong> &mdash; the supplier is unpredictable. Treat the upper bound as the planning lead time, or add buffer stock for SKUs from that supplier.</li>
+</ul>
+
+<h3 id="international-orders">International / container orders</h3>
+<p>Suppliers based outside Australia don't get reordered one trickle at a time &mdash; they ship in containers two or three times a year. So the ordering UX changes for them: instead of "what should I order to cover the lead-time gap?", the question is "what should I order to cover X months of demand <em>after</em> the container lands?"</p>
+
+<p>The order page for an international supplier shows three things differently:</p>
+<ul>
+  <li><strong>Months of cover (post-arrival)</strong> &mdash; how long the order should last from when stock lands. Default is 4 months; adjust at the top of the order page.</li>
+  <li><strong>Forecast (X mo)</strong> column &mdash; expected demand over the cover period, using the seasonality-aware forecast.</li>
+  <li><strong>Cover %</strong> column &mdash; what share of forecast demand the suggested qty covers. 100% = exactly forecast demand. Above = additional safety. Below = the line is short and stock will run out before the next container.</li>
+</ul>
+
+<p>Suggested quantities include a 20% safety buffer and account for stock that will be consumed during the lead time itself (so you're not double-counting demand). Edit any line to override.</p>
+
 <hr>
 
 <h2>SKU lifecycle</h2>
@@ -612,6 +693,73 @@
 
 <h3 id="first-seen">First Seen</h3>
 <p>When this SKU first appeared in your inventory data. Mostly informational &mdash; useful for distinguishing newer SKUs (where less history is available) from established ones.</p>
+
+<hr>
+
+<h2>Slow-moving items reference</h2>
+
+<h3 id="slow-moving-trigger">Slow-moving trigger</h3>
+<p>A SKU is flagged as slow-moving when <strong>either</strong>:</p>
+<ul>
+  <li>it has more than 180 days of cover at the current sales rate, OR</li>
+  <li>it sold fewer than the slow-moving threshold (default 24 units / 12 months) over the last 12 months <em>and</em> still has stock on hand.</li>
+</ul>
+
+<p>SKUs younger than the new-SKU grace period (default 180 days) are exempt &mdash; they haven't had a fair shot yet. SKUs older than the grace period but younger than 12 months have their sales annualised so they're judged on the same scale as established SKUs. Discontinuing SKUs always show on the page so end-of-life decisions don't get lost.</p>
+
+<p>Both the threshold and grace period are tenant-configurable from <a href="#">Admin</a>.</p>
+
+<h3 id="slow-moving-decisions">Decision tags</h3>
+<p>Each slow-moving SKU gets one or more decision tags. Multi-select &mdash; a SKU can be both "Discount" and "Bundle" if you're trying both. Click a tag to toggle it on/off.</p>
+<ul>
+  <li><strong>Keep monitoring</strong> &mdash; not ready to act yet, but acknowledged. Use this to clear the SKU from the "pending decision" pile without committing to a strategy.</li>
+  <li><strong>Discount</strong> &mdash; will be price-reduced to move stock.</li>
+  <li><strong>Bundle</strong> &mdash; will be combined with another product to clear faster.</li>
+  <li><strong>Liquidate</strong> &mdash; sell at cost or below to clear remaining stock.</li>
+  <li><strong>Discontinuing</strong> &mdash; this SKU's lifecycle is ending. Pair with setting the SKU's status to <a href="#sku-status">Discontinuing</a>.</li>
+</ul>
+
+<p>Tags are persistent &mdash; they stay attached even if the SKU drops back below the slow-moving threshold, so the history of decisions is preserved.</p>
+
+<hr>
+
+<h2>Purchase orders reference</h2>
+
+<h3 id="po-receipts">Receipts and partial receipts</h3>
+<p>Each PO line has a <strong>Qty Received</strong> column showing how many units have actually arrived. It can be:</p>
+<ul>
+  <li><strong>Zero</strong> &mdash; PO is placed but nothing has landed yet.</li>
+  <li><strong>Less than ordered</strong> &mdash; partial receipt. The supplier shipped some, more to come. Common for split shipments or partial back-orders.</li>
+  <li><strong>Equal to ordered</strong> &mdash; fully received. The line is closed.</li>
+  <li><strong>Greater than ordered</strong> &mdash; rare, but possible. Supplier over-shipped and you accepted it.</li>
+</ul>
+
+<p><strong>Date Received</strong> shows the latest receipt date for the line. Used by <a href="#lead-time-learning">lead-time learning</a> to compare actual against stated lead times.</p>
+
+<h3 id="po-changes">Lines with recent changes</h3>
+<p>Counts PO line items where the quantity, price, or status changed in DEAR since the previous sync. The point is to surface surprises &mdash; a supplier amending an order, a partial receipt landing overnight, a price correction &mdash; without you having to scan every line manually.</p>
+
+<p>If the count is zero, nothing has shifted since last sync. If it's non-zero, the affected lines are highlighted in the per-supplier groups below.</p>
+
+<hr>
+
+<h2>Forecasting reference</h2>
+
+<h3 id="forecast-accuracy">Forecast accuracy</h3>
+<p>The Dashboard home page closes with a four-tile read on how well the forecasting engine has been performing. Each forecast made in the past becomes scoreable once enough actual sales data exists to compare against. The strip aggregates the last 90 days of those comparisons.</p>
+
+<ul>
+  <li><strong>Accuracy</strong> &mdash; share of forecasts that landed within 30% of actuals. The headline number. Higher is better.</li>
+  <li><strong>Avg MAPE</strong> (Mean Absolute Percentage Error) &mdash; the average gap between forecast and actual demand, expressed as a percentage. Lower is better. Note: MAPE is sensitive to low-volume SKUs &mdash; a small absolute error on a SKU that sells one unit a month looks like a huge percentage. Read it alongside Accuracy rather than in isolation.</li>
+  <li><strong>Forecasts Scored</strong> &mdash; number of forecast/actual pairs that have been evaluated. More pairs = more confidence in the headline figures. Builds up over time.</li>
+  <li><strong>Health</strong> &mdash; plain-language reading: Strong (≥80%), Reasonable (≥60%), Improving (≥40%), Needs work (&lt;40%). What to act on:
+    <ul>
+      <li><strong>Strong / Reasonable</strong> &mdash; trust the forecast for reorder timing.</li>
+      <li><strong>Improving</strong> &mdash; the engine is still learning. Lean on manual reorder points for high-stakes SKUs until accuracy climbs.</li>
+      <li><strong>Needs work</strong> &mdash; usually means seasonality or boost data is missing. Set seasonality on top SKUs and apply <a href="#boost-multiplier">demand boosts</a> for known campaigns.</li>
+    </ul>
+  </li>
+</ul>
 
 <hr>
 
