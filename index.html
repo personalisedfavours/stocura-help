@@ -241,9 +241,15 @@
   <a href="#welcome">Welcome</a>
   <a href="#concepts">Core concepts</a>
 
+  <h4>The pages</h4>
+  <a href="#reorder-queue-page">Reorder Queue</a>
+  <a href="#stock-overview-page">Stock Overview</a>
+  <a href="#sku-detail-page">SKU Detail page</a>
+
   <h4>Stock levels</h4>
   <a href="#available">Available</a>
   <a href="#on-hand">On Hand</a>
+  <a href="#allocated">Allocated</a>
   <a href="#on-order">On Order</a>
   <a href="#avg-cost">Avg Cost</a>
   <a href="#days-cover">Days Cover</a>
@@ -326,6 +332,49 @@
 
 <p>How it's calculated is the topic of the next section.</p>
 
+<h2 id="pages">The pages <span class="anchor-tag">#pages</span></h2>
+
+<p>stocura is organised around four screens you'll touch every day. This section is a quick orientation to each one — what it's for, how to read it, and what to do when something looks off.</p>
+
+<h3 id="reorder-queue-page">The Reorder Queue</h3>
+<p>The home page. A daily checklist of SKUs that need attention. Healthy SKUs aren't shown here — see <a href="#stock-overview-page">Stock Overview</a> for the full list.</p>
+
+<p>The queue is split into two priority buckets:</p>
+<ul>
+  <li><strong>Order Now</strong> — at or below reorder point, no PO placed yet, supplier is domestic. These need action this week.</li>
+  <li><strong>Needs Review</strong> — supplier is out of stock, awaiting inventory sync, or international SKUs below threshold (which order via container 2-3 times a year, not as one-offs).</li>
+</ul>
+
+<p>SKUs already on order are hidden — once a PO covers the threshold, the queue stops nagging. The <strong>Suggested Qty</strong> column tells you how much to order: enough to cover lead-time demand plus a buffer, rounded up to MOQ and pack size. Click <strong>Order Now</strong> on any row to start the PO with that SKU pre-selected.</p>
+
+<p>Filters at the top let you split the queue by domestic / international suppliers — useful when domestic and container ordering are run by different people.</p>
+
+<h3 id="stock-overview-page">Stock Overview</h3>
+<p>Every active SKU at a glance — sortable by any column, filterable by supplier and search. Use this when you want a complete picture rather than just the reorder queue's priority subset.</p>
+
+<p>Three column families:</p>
+<ul>
+  <li><strong>Stock levels</strong> — Available, On Hand, Allocated, On Order. The first three describe what's in your warehouse right now; the last is what's coming.</li>
+  <li><strong>Decision metrics</strong> — Reorder Point and Days Cover. These tell you whether the SKU is in trouble or healthy at the current sales rate.</li>
+  <li><strong>Operational</strong> — Notes, Stock Synced (when we last pulled live numbers from your inventory system).</li>
+</ul>
+
+<p>The summary cards at the top give a roll-up: how many SKUs total, how many are out of stock, total available units across all SKUs, total on order. Useful for catching the day a supplier delivery is delayed and your "Out of Stock" count creeps up unexpectedly.</p>
+
+<p>To configure a SKU, click its name to open the <a href="#sku-detail-page">SKU Detail page</a>.</p>
+
+<h3 id="sku-detail-page">The SKU Detail page</h3>
+<p>The deepest-dive view. Everything stocura knows about one SKU. Four sections, top to bottom:</p>
+
+<ul>
+  <li><strong>Stat cards</strong> — current numbers: stock levels, reorder points, projected order date, 3-month forecast. Hover any label for an explanation.</li>
+  <li><strong>Charts</strong> — sales movement over the last 12 months (with 3-month forecast overlay), 14-day daily activity, wastage and adjustments.</li>
+  <li><strong>Product Info</strong> — reference data: lead time, supplier, last PO, typical order size, when the SKU was first seen.</li>
+  <li><strong>Configuration cards</strong> (collapsed by default) — <strong>SKU Configuration</strong> for lead time, MOQ, pack size, reorder source, seasonality, and lifecycle status. <strong>Demand Boost</strong> for short-term campaign multipliers and the boost history.</li>
+</ul>
+
+<p>If you're new to a SKU, the order to read it is: stat cards (what's the situation?) → Product Info (any context I'm missing?) → charts (what's the pattern been?) → configuration (anything I should change?).</p>
+
 <h2 id="reorder-calculation">How the reorder calculation works</h2>
 
 <p>The reorder point answers a single question: <em>at what stock level should I place a new order so that my next stock arrives before I run out?</em></p>
@@ -377,6 +426,9 @@
 
 <h3 id="on-hand">On Hand</h3>
 <p>Total units physically in the warehouse, including any tied to existing orders. This is what you'd count if you walked the shelves.</p>
+
+<h3 id="allocated">Allocated</h3>
+<p>Units already promised to existing orders but not yet shipped. This is the gap between On Hand and Available — physically present, but not yours to sell again. The relationship: <code>Available = On Hand &minus; Allocated</code>.</p>
 
 <h3 id="on-order">On Order</h3>
 <p>Units currently on a placed purchase order, due to arrive. The system uses this when computing <a href="#days-cover">days cover</a> and projected order dates so you don't double-order something that's already on its way.</p>
