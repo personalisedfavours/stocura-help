@@ -343,7 +343,7 @@
 <p>The relationship: <code>Available = On Hand − Allocated</code>. If you have 100 on hand and 30 are tied to open orders, only 70 are available to promise to the next customer.</p>
 
 <h3>Suppliers, lead time, MOQ</h3>
-<p>Each SKU is bought from a <strong>supplier</strong>. The supplier has a <strong>lead time</strong> (days from when you place the order to when stock arrives) and often a <strong>minimum order quantity</strong> (MOQ). stocura uses lead time to work out when to reorder, and MOQ to round order quantities up to the smallest amount your supplier will accept.</p>
+<p>Each SKU is bought from a <strong>supplier</strong>. The supplier has a <strong>lead time</strong> (business days from placing the order to stock arriving &mdash; weekends excluded, public holidays not factored in) and often a <strong>minimum order quantity</strong> (MOQ). stocura uses lead time to work out when to reorder, and MOQ to round order quantities up to the smallest amount your supplier will accept.</p>
 
 <h3>The reorder point</h3>
 <p>The single most important number in stocura. The <strong>reorder point</strong> is the stock level at which the system says "place a new order now." It's calculated to give you just enough buffer that the next batch lands before you run out — no more, no less.</p>
@@ -625,7 +625,13 @@
 
 <h3 id="lead-time">Lead Time</h3>
 <h3 id="lead-time-config">Lead Time (Config)</h3>
-<p>Days from placing a purchase order to stock arriving. Used in every reorder calculation &mdash; lead time directly determines how much lead-time demand the reorder point needs to cover.</p>
+<p><strong>Business days</strong> from placing a purchase order to stock arriving. Used in every reorder calculation &mdash; lead time directly determines how much lead-time demand the reorder point needs to cover.</p>
+
+<p><strong>Business days means Monday to Friday.</strong> Weekends are skipped. So a 5-day lead time placed on Friday means stock is expected to arrive the following Wednesday, not Monday.</p>
+
+<p><strong>Public holidays are not factored in.</strong> If your supplier observes Christmas, Easter, Chinese New Year, or other extended closures, add a couple of days to your stated lead time to absorb them. This is a v1 limitation &mdash; per-region public holiday awareness is on the roadmap.</p>
+
+<p>For internal demand math, stocura treats 5 business days as 7 calendar days of selling (assuming your business sells continuously, not just Mon&ndash;Fri). This makes reorder points slightly more protective than a naive "5 calendar days of demand" calculation.</p>
 
 <p>You can set lead time at the SKU level (overriding the supplier default) for cases where one product takes longer than the supplier's typical timeline. If the SKU-level field is blank, the system falls back to the supplier-level setting.</p>
 
@@ -652,7 +658,11 @@
 <h3 id="lead-time-learning">Lead Time Learning</h3>
 <p>Compares actual lead times (order placed → stock arrived) against the supplier-stated lead time. Once a few completed POs are recorded, you'll see <strong>Avg Actual</strong>, <strong>Avg Variance</strong> (how much late or early), and the min/max range on the supplier detail page.</p>
 
-<p>What to do with it:</p>
+<p><strong>Current state (informational only):</strong> the variance shown is for you to review. Adjust the supplier's stated lead time manually if you see persistent variance.</p>
+
+<p><strong>Planned auto-takeover:</strong> once 3 months of history or 6+ received POs are recorded for a supplier (whichever comes first), stocura will take over the lead time for that supplier automatically, using a trimmed mean of the observed values. You'll receive a daily digest email when this happens with a link to review or flip the supplier back to manual estimates. Only POs created inside stocura count toward the threshold &mdash; CSV imports and POs synced from Cin7 Core are excluded.</p>
+
+<p>What to do in the meantime:</p>
 <ul>
   <li><strong>Variance close to zero</strong> &mdash; supplier is reliable. Stated lead time is fine.</li>
   <li><strong>Positive variance (chronically late)</strong> &mdash; bump the supplier's stated lead time up so reorder points fire earlier. Don't just absorb the late delivery as wastage of cover.</li>
