@@ -290,6 +290,7 @@
   <a href="#last-po-qty">Last PO Qty</a>
   <a href="#days-since-received">Days Since Received</a>
   <a href="#lead-time-learning">Lead Time Learning</a>
+  <a href="#multi-supplier">Multi-supplier</a>
   <a href="#international-orders">International orders</a>
 
   <h4>Slow-moving</h4>
@@ -656,18 +657,50 @@
 <p>How long since stock last arrived from a supplier. Goes amber after 6 months &mdash; possibly a stale supplier relationship worth reviewing, or a SKU you're winding down without realising.</p>
 
 <h3 id="lead-time-learning">Lead Time Learning</h3>
-<p>Compares actual lead times (order placed → stock arrived) against the supplier-stated lead time. Once a few completed POs are recorded, you'll see <strong>Avg Actual</strong>, <strong>Avg Variance</strong> (how much late or early), and the min/max range on the supplier detail page.</p>
+<p>stocura tracks how long every PO actually takes (order placed &rarr; stock received) and compares it against the supplier's stated lead time. Once a supplier has enough history, the system takes over their lead time automatically using a trimmed mean of observed values.</p>
 
-<p><strong>Current state (informational only):</strong> the variance shown is for you to review. Adjust the supplier's stated lead time manually if you see persistent variance.</p>
+<p><strong>When auto-takeover kicks in:</strong> the system waits until a supplier has either <strong>6+ received POs</strong> placed inside stocura, OR the oldest received PO is <strong>90+ days old</strong> &mdash; whichever comes first. Below that threshold the supplier stays in manual mode and the supplier detail page shows a progress bar so you can see how close it is. POs synced from Cin7 Core (rather than placed via stocura) don't count toward the threshold &mdash; we need our own ground truth.</p>
 
-<p><strong>Planned auto-takeover:</strong> once 3 months of history or 6+ received POs are recorded for a supplier (whichever comes first), stocura will take over the lead time for that supplier automatically, using a trimmed mean of the observed values. You'll receive a daily digest email when this happens with a link to review or flip the supplier back to manual estimates. Only POs created inside stocura count toward the threshold &mdash; CSV imports and POs synced from Cin7 Core are excluded.</p>
+<p><strong>How the learned value is calculated:</strong> trimmed mean across all received POs for that supplier &mdash; the top and bottom 10% are dropped as outliers when there are 10 or more samples (one stuck-at-customs delivery shouldn't skew the average). Rounded up to whole business days. The learning cron runs once a day; when the threshold is met for a supplier, takeover is automatic.</p>
 
-<p>What to do in the meantime:</p>
+<p><strong>Takeover email:</strong> on the morning the system takes over a supplier, you'll receive a digest email listing every supplier affected &mdash; what the lead time was, what it's now, how many POs informed the change, and a link to review or flip back to manual.</p>
+
+<p><strong>Mode banner on the supplier detail page:</strong></p>
+<ul>
+  <li><strong>Learned mode</strong> (green) &mdash; lead time is being maintained automatically. A "Switch to manual" button lets you take control back at any time; the learned value is remembered so you can flip back later.</li>
+  <li><strong>Manual mode</strong> (amber) &mdash; you're maintaining the lead time. If the threshold has been met, a "Use learned (X bd)" button lets you opt in early without waiting for the cron.</li>
+</ul>
+
+<p><strong>Observation data</strong> &mdash; regardless of mode, the supplier page shows rolling stats: Avg Actual, Avg Variance (how late or early on average), and the min/max range. Useful even when you're staying manual, for sanity-checking your stated value.</p>
+
+<p>Reviewing the variance:</p>
 <ul>
   <li><strong>Variance close to zero</strong> &mdash; supplier is reliable. Stated lead time is fine.</li>
-  <li><strong>Positive variance (chronically late)</strong> &mdash; bump the supplier's stated lead time up so reorder points fire earlier. Don't just absorb the late delivery as wastage of cover.</li>
+  <li><strong>Positive variance (chronically late)</strong> &mdash; bump the lead time up so reorder points fire earlier. Don't just absorb the late delivery as wasted cover.</li>
   <li><strong>Wide range</strong> &mdash; the supplier is unpredictable. Treat the upper bound as the planning lead time, or add buffer stock for SKUs from that supplier.</li>
 </ul>
+
+<p><strong>One catch:</strong> a SKU can override its supplier's lead time individually (tick "Override supplier lead time" on the SKU Configuration form). When set, the override beats the supplier's value &mdash; including a learned one. Use this for products that genuinely ship differently from the rest of the supplier's catalogue.</p>
+
+<h3 id="multi-supplier">Multi-supplier (secondary supplier per SKU)</h3>
+<p>Some SKUs can be sourced from more than one supplier &mdash; e.g. a primary overseas supplier you order containers from, plus a domestic backup for when the main shipment is delayed. stocura lets you set one optional <strong>secondary supplier</strong> per SKU on top of the primary.</p>
+
+<p><strong>To set one:</strong> open the SKU detail page, expand <strong>SKU Configuration</strong>, and pick a Secondary Supplier from the dropdown below the primary. It has to differ from the primary &mdash; the form rejects same-supplier picks.</p>
+
+<p><strong>What the secondary does:</strong></p>
+<ul>
+  <li>When you click <strong>Order Now</strong> on a SKU that has both suppliers set, a picker opens asking which supplier to order from. The primary is preselected and flagged.</li>
+  <li>On the secondary supplier's order page, the SKU appears with a bronze <strong>SECONDARY</strong> badge next to its name &mdash; so it's clear it's a backup-source line, not their main inventory with you.</li>
+</ul>
+
+<p><strong>What the secondary doesn't do:</strong></p>
+<ul>
+  <li>It doesn't change <em>when</em> a reorder is triggered &mdash; that still uses the primary supplier's lead time and the SKU-level overrides.</li>
+  <li>It doesn't change MOQ or pack size &mdash; those are SKU-level fields that follow the primary.</li>
+  <li>Each supplier still <a href="#lead-time-learning">learns lead times</a> from <em>their own</em> POs. If you place an order with the secondary, that PO informs the secondary's lead-time history without affecting the primary's.</li>
+</ul>
+
+<p>If you <a href="#suppliers-page">merge two suppliers</a> and the merge would cause a SKU to have the same supplier listed twice (because the source was the secondary on a SKU where the target was primary, or vice versa), the secondary is auto-cleared on those SKUs. The merge audit log records how many SKUs were affected.</p>
 
 <h3 id="international-orders">International / container orders</h3>
 <p>Suppliers based outside Australia don't get reordered one trickle at a time &mdash; they ship in containers two or three times a year. So the ordering UX changes for them: instead of "what should I order to cover the lead-time gap?", the question is "what should I order to cover X months of demand <em>after</em> the container lands?"</p>
