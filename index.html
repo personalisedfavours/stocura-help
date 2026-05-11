@@ -312,6 +312,12 @@
   <h4>Notifications</h4>
   <a href="#notifications">Email digests</a>
 
+  <h4>Security</h4>
+  <a href="#two-factor-auth">Two-factor authentication</a>
+  <a href="#trusted-devices">Trusted devices</a>
+  <a href="#backup-codes">Backup codes</a>
+  <a href="#2fa-enforcement">Required 2FA (admins)</a>
+
   <h4>Help &amp; FAQ</h4>
   <a href="#faq">Frequently asked</a>
 </aside>
@@ -821,6 +827,59 @@
 
 <h3>Boost ended</h3>
 <p>Daily digest of demand boosts that ended (auto-expired or manually ended) since the last pass. Includes the actual lift comparison so you can refine your estimates next time.</p>
+
+<hr>
+
+<h2 id="security">Security</h2>
+
+<p>stocura supports two-factor authentication (2FA) on every account. We strongly recommend turning it on — a leaked password alone is no longer enough to access your data.</p>
+
+<h3 id="two-factor-auth">Two-factor authentication</h3>
+
+<p>2FA adds a second step to sign-in: after entering your password, you supply a short code from an authenticator app or your email. Open the <strong>user menu</strong> in the top right and click <strong>Two-factor authentication</strong> to set it up.</p>
+
+<p>Two methods are supported:</p>
+<ul>
+  <li><strong>Authenticator app (recommended).</strong> Google Authenticator, Authy, 1Password, Microsoft Authenticator, or any other TOTP app. Works offline. Codes refresh every 30 seconds. Harder to intercept than email and faster to enter day-to-day.</li>
+  <li><strong>Email codes.</strong> We email a 6-digit code to your account email each time you sign in. Codes expire in 10 minutes. Works without an extra app but depends on email delivery.</li>
+</ul>
+
+<p>You can switch methods at any time by turning 2FA off and re-enabling with the other method.</p>
+
+<h3 id="trusted-devices">Trusted devices</h3>
+
+<p>At sign-in, after you enter your second-factor code, you can tick <strong>Trust this device for 30 days</strong>. We'll remember this browser and won't ask for a code on it for the next 30 days — you still enter your password, and 2FA still kicks in on any other device.</p>
+
+<p>Manage trusted devices on the <strong>Two-factor authentication</strong> page. Each entry shows the device (e.g. Chrome on macOS), the IP it signed in from, when it was last used, and when it expires. Click <strong>Revoke</strong> to remove a single device, or <strong>Revoke all devices</strong> if you've lost a laptop or want a clean slate. Revoked devices are asked for a code on their next sign-in.</p>
+
+<p>Disabling 2FA automatically revokes all trusted devices for that account.</p>
+
+<h3 id="backup-codes">Backup codes</h3>
+
+<p>When you enable 2FA we give you 10 single-use backup codes. <strong>Save these somewhere safe</strong> — they're the only way back into your account if you lose your phone or can't get email. We display them once and never again; if you lose them, you can regenerate a new set (which invalidates the old set) from the Two-factor authentication page.</p>
+
+<p>Backup codes work in any of these situations:</p>
+<ul>
+  <li>Your authenticator app is on a device you can't access</li>
+  <li>You're not receiving the email code</li>
+  <li>Your account is temporarily locked from too many wrong codes</li>
+</ul>
+
+<p>Each code works exactly once. After using a code, it disappears from your set.</p>
+
+<h3 id="2fa-lockout">If you enter too many wrong codes</h3>
+
+<p>After 5 wrong codes in a row, sign-in is paused on that account for 15 minutes. This protects against someone trying to guess codes. Backup codes still work during the lockout — they're the always-on escape hatch.</p>
+
+<h3 id="2fa-enforcement">Required 2FA for admins</h3>
+
+<p>On a team plan, an admin can require all other admins to have 2FA enabled. Find the toggle under <strong>Settings &rarr; Security &amp; access</strong>. When on, any admin who hasn't set up 2FA is walked through the setup the next time they sign in. Viewers (non-admin roles) are never forced.</p>
+
+<p>For safety, you can't enable this requirement unless you have 2FA on your own account — otherwise you'd be locked out of changing the setting back.</p>
+
+<h3>Turning 2FA off</h3>
+
+<p>On the Two-factor authentication page, click <strong>Turn off 2FA</strong>. You'll be asked for a current code (or a backup code) to confirm — same protection as signing in. Once off, your account goes back to password-only and your existing trusted devices are revoked.</p>
 
 <hr>
 
