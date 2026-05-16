@@ -310,7 +310,10 @@
   <a href="#first-seen">First Seen</a>
 
   <h4>Notifications</h4>
-  <a href="#notifications">Email digests</a>
+  <a href="#notifications">Overview</a>
+  <a href="#alert-channels">Email, Slack, Google Chat</a>
+  <a href="#setup-slack">Set up Slack alerts</a>
+  <a href="#setup-chat">Set up Google Chat alerts</a>
 
   <h4>Security</h4>
   <a href="#two-factor-auth">Two-factor authentication</a>
@@ -812,15 +815,65 @@
 
 <hr>
 
-<h2 id="notifications">Notifications and email digests</h2>
+<h2 id="notifications">Notifications and alerts</h2>
 
-<p>stocura sends a small number of email digests rather than a stream of individual alerts. All digests fire at your configured digest time in your local timezone &mdash; one email per day per category, even if multiple events occur.</p>
+<p>stocura can send alerts to email, Slack, and Google Chat. Pick whichever channels suit your team — you can mix them per alert type (e.g. reorder alerts as a daily Slack digest, out-of-stock alerts as immediate emails).</p>
 
-<h3>Reorder alerts (digest)</h3>
-<p>Daily list of SKUs that crossed their reorder point since the last pass. Configure recipients and digest time on the Settings page.</p>
+<p>All alerts are configured in <strong><a href="https://app.stocura.com/settings#alerts">Settings &rarr; Alerts</a></strong>.</p>
+
+<h3 id="alert-channels">Email, Slack, and Google Chat</h3>
+
+<p>Three things to configure per alert type:</p>
+<ul>
+  <li><strong>Mode</strong> &mdash; Off, Immediate (one message per SKU as it crosses the threshold), or Daily digest (one batched message per day at your local time).</li>
+  <li><strong>Scope</strong> &mdash; Domestic suppliers only, or all suppliers. International suppliers ship containers 2-3x/year so daily reorder alerts for them are usually noise.</li>
+  <li><strong>Channels</strong> &mdash; tick Email, Slack, Google Chat &mdash; or any combination. Each ticked channel gets the same alert content, formatted for that platform. If multiple channels are ticked and one fails, the others still go through.</li>
+</ul>
+
+<p>Slack and Google Chat need a webhook URL configured before you can tick those channels. The next two sections walk through getting each one.</p>
+
+<h3 id="setup-slack">Set up Slack alerts</h3>
+
+<p>Slack delivers alerts as rich Block Kit messages with SKU details, supplier, stock levels, and a button that opens the SKU in stocura.</p>
+
+<ol>
+  <li>Go to <a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener">api.slack.com/messaging/webhooks</a> and follow Slack's <strong>Create your Slack app</strong> flow. If your workspace already has a Slack app you control, you can add a webhook to it instead.</li>
+  <li>Enable <strong>Incoming Webhooks</strong> on the app.</li>
+  <li>Click <strong>Add New Webhook to Workspace</strong> and pick the channel you want stocura alerts to land in.</li>
+  <li>Copy the generated webhook URL. It starts with <code>https://hooks.slack.com/services/</code>.</li>
+  <li>In stocura, open <strong><a href="https://app.stocura.com/settings#alerts">Settings &rarr; Alerts</a></strong>, paste the URL into the <strong>Slack incoming webhook URL</strong> field, and click <strong>Send test</strong>. A test message should appear in your Slack channel within a few seconds.</li>
+  <li>Click <strong>Save Webhook URLs</strong>.</li>
+  <li>In the alert configuration below, tick <strong>Slack</strong> on the alert types you want sent to Slack. Click <strong>Save Alert Settings</strong>.</li>
+</ol>
+
+<p><strong>Treat the URL as a credential.</strong> Anyone with the URL can post messages to your Slack channel. stocura encrypts it at rest (AES-256-GCM). Don't share it.</p>
+
+<h3 id="setup-chat">Set up Google Chat alerts</h3>
+
+<p>Google Chat delivers alerts as Cards v2 messages with collapsible per-SKU sections for digests, and an <strong>Open in Stocura</strong> button on every alert.</p>
+
+<ol>
+  <li>Open the Google Chat space you want stocura alerts to land in.</li>
+  <li>Click the space name at the top, then <strong>Space settings</strong>.</li>
+  <li>Go to <strong>Apps and integrations</strong>.</li>
+  <li>Click <strong>Webhooks</strong>, then <strong>Add webhooks</strong>.</li>
+  <li>Give it a name (e.g. "stocura alerts") and click <strong>Save</strong>.</li>
+  <li>Copy the webhook URL. It starts with <code>https://chat.googleapis.com/v1/spaces/</code>.</li>
+  <li>In stocura, open <strong><a href="https://app.stocura.com/settings#alerts">Settings &rarr; Alerts</a></strong>, paste the URL into the <strong>Google Chat webhook URL</strong> field, and click <strong>Send test</strong>. A test card should appear in your Google Chat space within a few seconds.</li>
+  <li>Click <strong>Save Webhook URLs</strong>.</li>
+  <li>In the alert configuration below, tick <strong>Google Chat</strong> on the alert types you want sent there. Click <strong>Save Alert Settings</strong>.</li>
+</ol>
+
+<p>Same credential discipline as Slack — anyone with the URL can post into your Chat space, so we encrypt it at rest and you should not share it.</p>
+
+<h3 id="reorder-digest">Reorder alerts</h3>
+<p>Fires when a SKU crosses its reorder point. In <strong>Immediate</strong> mode you get one message per SKU as it crosses (deduped within a 30-day window). In <strong>Daily digest</strong> mode you get one batched message per day at your local time, listing every SKU that crossed since the last digest.</p>
+
+<h3 id="oos-digest">Out-of-stock alerts</h3>
+<p>Fires when a SKU drops to or below its buffer-stock level. Same Immediate / Daily options as reorder alerts. Configure independently from reorder alerts &mdash; e.g. immediate to Slack for OOS, daily digest to email for reorder.</p>
 
 <h3>Staging notifications</h3>
-<p>Daily list of newly-staged SKUs that need a manual reorder point set before they can become active. Helps prevent SKUs from sitting in staging indefinitely.</p>
+<p>Daily list of newly-staged SKUs that need a manual reorder point set before they can become active. Helps prevent SKUs from sitting in staging indefinitely. Email-only for now.</p>
 
 <h3>Reorder graduation</h3>
 <p>One-off email when a Blended SKU has accumulated 6 months of data and auto-graduates to System reorder source. Lets you know the system is now using the calculated value rather than your manual one.</p>
