@@ -257,6 +257,7 @@
   <a href="#allocated">Allocated</a>
   <a href="#on-order">On Order</a>
   <a href="#avg-cost">Avg Cost</a>
+  <a href="#stock-value">Stock Value</a>
   <a href="#days-cover">Days Cover</a>
   <a href="#stock-sync">Stock Sync</a>
 
@@ -500,10 +501,15 @@
 <p>Units already promised to existing orders but not yet shipped. This is the gap between On Hand and Available — physically present, but not yours to sell again. The relationship: <code>Available = On Hand &minus; Allocated</code>.</p>
 
 <h3 id="on-order">On Order</h3>
-<p>Units currently on a placed purchase order, due to arrive. The system uses this when computing <a href="#days-cover">days cover</a> and projected order dates so you don't double-order something that's already on its way.</p>
+<p>Units currently on a placed purchase order, due to arrive. Calculated as the sum of <code>qty_ordered &minus; qty_received</code> across every Stocura PO line in <strong>ordered</strong> or <strong>partially received</strong> status &mdash; so the tile updates the moment you place a PO and always agrees with the POs section below it on the SKU page.</p>
+<p>The system uses this when computing <a href="#days-cover">days cover</a> and projected order dates so you don't double-order something that's already on its way.</p>
 
 <h3 id="avg-cost">Avg Cost (DEAR)</h3>
 <p>Average cost per unit pulled from your DEAR / Cin7 Core inventory system. Updates daily. Used for cost calculations across the app but not for any reorder logic.</p>
+
+<h3 id="stock-value">Stock Value</h3>
+<p>On-hand units multiplied by average cost &mdash; what your warehouse is worth in stock right now, in your tenant's currency. The SKU page shows the calculation under the figure (e.g. <em>491 &times; $2.09 avg cost</em>) so the source is traceable.</p>
+<p>If average cost is missing for a SKU (typically a brand-new SKU before its first receipt has posted), Stock Value displays "&mdash;" rather than guessing.</p>
 
 <h3 id="days-cover">Days Cover</h3>
 <p>How many days of stock you have at the current sales rate, including units already on order. Calculated as:</p>
@@ -511,7 +517,12 @@
 <p>This is your runway. A SKU with 30 days cover doesn't need urgent attention; one with 3 days does.</p>
 
 <h3 id="stock-sync">Stock Synced</h3>
-<p>Last time we pulled live stock numbers from your inventory system. The hourly sync runs automatically &mdash; if this timestamp is more than a few hours old, something's wrong with the sync. Check the Admin page for sync status.</p>
+<p>Last time stocura updated live stock numbers from your inventory system. Two paths keep this current:</p>
+<ul>
+  <li>A <strong>nightly full reconciliation</strong> at 2&nbsp;a.m. local time pulls fresh figures for every active SKU and writes the baseline.</li>
+  <li>Throughout the day, a <strong>targeted refresh</strong> fires within 30 minutes of any movement &mdash; a completed assembly, a stock adjustment, a PO receipt. The affected SKU's numbers update without waiting for the overnight cycle.</li>
+</ul>
+<p>So the timestamp on any one SKU updates when that SKU actually changes &mdash; quieter than an hourly poll, and more current. If a SKU's timestamp is more than a day old, something's wrong. Check the Sync Health row at the top of the Admin page for a quick read.</p>
 
 <hr>
 
